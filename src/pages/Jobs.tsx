@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
+import { fetchRemoteJobs, RemoteJob } from '@/lib/remote-jobs';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -43,13 +44,17 @@ export default function Jobs() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [jobs, setJobs] = useState<Job[]>([]);
   const [loading, setLoading] = useState(true);
+  const [remoteLoading, setRemoteLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState(searchParams.get('search') || '');
   const [locationFilter, setLocationFilter] = useState(searchParams.get('location') || '');
   const [jobTypeFilter, setJobTypeFilter] = useState(searchParams.get('type') || '');
   const [experienceFilter, setExperienceFilter] = useState(searchParams.get('experience') || '');
+  const [remoteJobs, setRemoteJobs] = useState<RemoteJob[]>([]);
+  const [remoteError, setRemoteError] = useState<string | null>(null);
 
   useEffect(() => {
     fetchJobs();
+    fetchExternalJobs();
   }, [searchParams]);
 
   const fetchJobs = async () => {
@@ -84,6 +89,19 @@ export default function Jobs() {
       setJobs(data);
     }
     setLoading(false);
+  };
+
+  const fetchExternalJobs = async () => {
+    setRemoteError(null);
+    setRemoteLoading(true);
+    try {
+      const external = await fetchRemoteJobs(searchParams.get('search') || undefined);
+      setRemoteJobs(external.slice(0, 10));
+    } catch (err) {
+      setRemoteError(err instanceof Error ? err.message : 'Unable to load remote jobs');
+    } finally {
+      setRemoteLoading(false);
+    }
   };
 
   const handleSearch = (e: React.FormEvent) => {
@@ -310,6 +328,94 @@ export default function Jobs() {
                       View Details
                       <ArrowRight className="ml-2 h-4 w-4" />
                     </Link>
+                  </Button>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Remote Jobs (External API) */}
+      <div className="max-w-6xl mx-auto space-y-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-2xl font-display font-bold text-foreground">Remote Opportunities</h2>
+            <p className="text-muted-foreground">Live listings from external sources (no account needed)</p>
+          </div>
+          <Button variant="outline" size="sm" onClick={fetchExternalJobs} disabled={remoteLoading}>
+            {remoteLoading ? 'Refreshing…' : 'Refresh'}
+          </Button>
+        </div>
+
+        {remoteLoading ? (
+          <div className="space-y-3">
+            {[1, 2, 3].map((i) => (
+              <Card key={`remote-skel-${i}`}>
+                <CardHeader>
+                  <Skeleton className="h-5 w-60 mb-2" />
+                  <Skeleton className="h-4 w-48" />
+                </CardHeader>
+              </Card>
+            ))}
+          </div>
+        ) : remoteError ? (
+          <Card>
+            <CardContent className="py-6">
+              <p className="text-destructive">{remoteError}</p>
+              <Button variant="outline" className="mt-3" onClick={fetchExternalJobs}>
+                Retry
+              </Button>
+            </CardContent>
+          </Card>
+        ) : remoteJobs.length === 0 ? (
+          <Card>
+            <CardContent className="py-6">
+              <p className="text-muted-foreground">No external remote jobs matched your search.</p>
+            </CardContent>
+          </Card>
+        ) : (
+          <div className="space-y-3">
+            {remoteJobs.map((job) => (
+              <Card key={job.id} className="hover:shadow-md transition-shadow">
+                <CardHeader>
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <CardTitle className="text-lg">{job.title}</CardTitle>
+                      <CardDescription className="flex items-center gap-2 mt-1">
+                        <Building2 className="h-4 w-4" />
+                        {job.company_name}
+                      </CardDescription>
+                    </div>
+                    <Badge variant="secondary">{job.job_type || 'External'}</Badge>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex flex-wrap gap-3 text-sm text-muted-foreground mb-3">
+                    <span className="flex items-center gap-1">
+                      <MapPin className="h-4 w-4" />
+                      {job.location || 'Remote'}
+                    </span>
+                    <span className="flex items-center gap-1">
+                      <Clock className="h-4 w-4" />
+                      {job.created_at ? format(new Date(job.created_at), 'MMM d, yyyy') : 'Recently posted'}
+                    </span>
+                  </div>
+                  {job.tags && job.tags.length > 0 && (
+                    <div className="flex flex-wrap gap-2 mb-3">
+                      {job.tags.slice(0, 6).map((tag) => (
+                        <Badge key={tag} variant="outline" className="text-xs">
+                          {tag}
+                        </Badge>
+                      ))}
+                    </div>
+                  )}
+                  <p className="text-sm text-muted-foreground line-clamp-2 mb-3">{job.description}</p>
+                  <Button asChild variant="outline">
+                    <a href={job.url} target="_blank" rel="noopener noreferrer">
+                      View & Apply
+                      <ArrowRight className="ml-2 h-4 w-4" />
+                    </a>
                   </Button>
                 </CardContent>
               </Card>

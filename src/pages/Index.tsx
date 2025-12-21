@@ -156,7 +156,11 @@ export default function Index() {
                   I'm a Student
                 </Link>
               </Button>
-              <Button size="lg" variant="outline" asChild className="border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10">
+              <Button
+                size="lg"
+                asChild
+                className="bg-white/90 text-primary hover:bg-white shadow-md border border-primary/40"
+              >
                 <Link to="/auth">
                   <Building2 className="mr-2 h-5 w-5" />
                   I'm an Employer

@@ -17,8 +17,18 @@ import { CalendarIcon, Plus, X, Loader2, ArrowLeft } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 
-const jobTypes = ['Full-time', 'Part-time', 'Internship', 'Contract', 'Remote'];
-const experienceLevels = ['Entry Level', 'Mid Level', 'Senior Level', 'Executive'];
+const jobTypes = [
+  { value: 'full-time', label: 'Full-time' },
+  { value: 'part-time', label: 'Part-time' },
+  { value: 'internship', label: 'Internship' },
+  { value: 'contract', label: 'Contract' }
+];
+
+const experienceLevels = [
+  { value: 'entry', label: 'Entry Level' },
+  { value: 'mid', label: 'Mid Level' },
+  { value: 'senior', label: 'Senior Level' }
+];
 
 export default function PostJob() {
   const navigate = useNavigate();
@@ -167,7 +177,7 @@ export default function PostJob() {
                     </SelectTrigger>
                     <SelectContent>
                       {jobTypes.map((type) => (
-                        <SelectItem key={type} value={type}>{type}</SelectItem>
+                        <SelectItem key={type.value} value={type.value}>{type.label}</SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
@@ -183,7 +193,7 @@ export default function PostJob() {
                     </SelectTrigger>
                     <SelectContent>
                       {experienceLevels.map((level) => (
-                        <SelectItem key={level} value={level}>{level}</SelectItem>
+                        <SelectItem key={level.value} value={level.value}>{level.label}</SelectItem>
                       ))}
                     </SelectContent>
                   </Select>

@@ -47,7 +47,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
     { href: '/jobs', icon: Search, label: 'Browse Jobs', show: isStudent },
     { href: '/applications', icon: Briefcase, label: 'My Applications', show: isStudent },
     { href: '/job-matching', icon: Brain, label: 'AI Job Matching', show: isStudent },
-    { href: '/resume', icon: FileText, label: 'Resume Builder', show: isStudent },
+    { href: '/resume-center', icon: FileText, label: 'Resume Center', show: isStudent },
     { href: '/post-job', icon: Plus, label: 'Post a Job', show: isEmployer },
     { href: '/my-jobs', icon: Briefcase, label: 'My Job Posts', show: isEmployer },
     { href: '/employer-applications', icon: Users, label: 'Applications', show: isEmployer },

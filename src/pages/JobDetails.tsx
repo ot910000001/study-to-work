@@ -187,11 +187,13 @@ export default function JobDetails() {
             <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
               <div>
                 <div className="flex items-center gap-2 mb-2">
-                  <Badge variant={job.job_type === 'Internship' ? 'secondary' : 'default'}>
-                    {job.job_type}
+                  <Badge variant={job.job_type === 'internship' ? 'secondary' : 'default'}>
+                    {job.job_type.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())}
                   </Badge>
                   {job.experience_level && (
-                    <Badge variant="outline">{job.experience_level}</Badge>
+                    <Badge variant="outline">
+                      {job.experience_level.charAt(0).toUpperCase() + job.experience_level.slice(1)} Level
+                    </Badge>
                   )}
                 </div>
                 <CardTitle className="text-2xl md:text-3xl">{job.title}</CardTitle>

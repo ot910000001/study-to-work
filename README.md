@@ -36,6 +36,9 @@ TechConnect bridges the gap between students finishing their technical education
 - **Supabase** (PostgreSQL + Auth + Row Level Security)
 - Tables: `profiles`, `jobs`, `applications`, `user_roles`, `institutions`, `notifications`
 
+## Recent Updates
+- Updated the default institutions list to feature Bangalore-based universities (REVA University, PES University, Bangalore Institute of Technology, Christ University, VIT Bangalore).
+
 ### ML Microservice (Phase 4)
 - **Python 3.12** + **FastAPI** + **Uvicorn**
 - **TF-IDF** (scikit-learn) — text similarity between profiles and job descriptions

@@ -254,9 +254,9 @@ CREATE TRIGGER on_auth_user_created
 
 -- Insert some default institutions
 INSERT INTO public.institutions (name, location) VALUES
-  ('MIT - Massachusetts Institute of Technology', 'Cambridge, MA'),
-  ('Stanford University', 'Stanford, CA'),
-  ('Georgia Tech', 'Atlanta, GA'),
-  ('Carnegie Mellon University', 'Pittsburgh, PA'),
-  ('UC Berkeley', 'Berkeley, CA'),
+  ('REVA University', 'Bangalore, KA'),
+  ('PES University', 'Bangalore, KA'),
+  ('Bangalore Institute of Technology', 'Bangalore, KA'),
+  ('Christ University', 'Bangalore, KA'),
+  ('VIT Bangalore', 'Bangalore, KA'),
   ('Other', 'Various');

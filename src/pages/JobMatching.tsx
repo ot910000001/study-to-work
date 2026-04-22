@@ -31,6 +31,7 @@ import {
   type MatchResponse,
   type ModelInfo,
 } from '@/lib/matching-api';
+import { fetchRemoteJobs } from '@/lib/remote-jobs';
 
 export default function JobMatching() {
   const navigate = useNavigate();
@@ -45,6 +46,7 @@ export default function JobMatching() {
   const [loading, setLoading] = useState(true);
   const [matching, setMatching] = useState(false);
   const [showModelDetails, setShowModelDetails] = useState(false);
+  const [jobUrls, setJobUrls] = useState<Record<string, string>>({});
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -119,7 +121,7 @@ export default function JobMatching() {
       const clampedScore = Math.min(Math.round(matchScore * 10) / 10, 99);
 
       return {
-        job_id: job.id,
+        job_id: job.id.toString(),
         job_title: job.title,
         company_name: job.company_name,
         location: job.location,
@@ -158,16 +160,27 @@ export default function JobMatching() {
     setMatching(true);
     try {
       // Fetch all active jobs from Supabase
-      const { data: jobs, error } = await supabase
+      const { data: localJobs, error } = await supabase
         .from('jobs')
         .select('*')
         .eq('is_active', true);
 
       if (error) throw error;
-      if (!jobs || jobs.length === 0) {
+      
+      let remoteJobsData: any[] = [];
+      try {
+        const fetchRes = await fetchRemoteJobs();
+        remoteJobsData = fetchRes;
+      } catch (err) {
+        console.error("Failed to fetch remote jobs", err);
+      }
+
+      const allJobs = [...(localJobs || []), ...remoteJobsData];
+
+      if (allJobs.length === 0) {
         toast({
           title: 'No jobs available',
-          description: 'There are no active job listings to match against. Ask an employer to post jobs first.',
+          description: 'There are no active job listings to match against.',
           variant: 'destructive',
         });
         setMatching(false);
@@ -182,16 +195,24 @@ export default function JobMatching() {
         experience: profile.experience || '',
       };
 
-      const jobListings = jobs.map((j: any) => ({
-        id: j.id,
+      const jobListings = allJobs.map((j: any) => ({
+        id: j.id.toString(),
         title: j.title || '',
         description: j.description || '',
-        skills_required: j.skills_required || [],
+        skills_required: j.skills_required || j.tags || [],
         experience_level: j.experience_level || '',
         job_type: j.job_type || '',
         company_name: j.company_name || '',
         location: j.location || '',
       }));
+
+      const urlMap: Record<string, string> = {};
+      allJobs.forEach((j: any) => {
+        if (j.url) {
+          urlMap[j.id.toString()] = j.url;
+        }
+      });
+      setJobUrls(urlMap);
 
       let response: MatchResponse;
 
@@ -480,9 +501,15 @@ export default function JobMatching() {
                         </p>
                       </div>
                       <Button size="sm" className="gap-1" asChild>
-                        <Link to={`/jobs/${match.job_id}`}>
-                          View Job <ArrowRight className="h-3 w-3" />
-                        </Link>
+                        {!jobUrls[match.job_id] ? (
+                          <Link to={`/jobs/${match.job_id}`}>
+                            View Job <ArrowRight className="h-3 w-3" />
+                          </Link>
+                        ) : (
+                          <a href={jobUrls[match.job_id]} target="_blank" rel="noopener noreferrer">
+                            External <ArrowRight className="h-3 w-3" />
+                          </a>
+                        )}
                       </Button>
                     </div>
 

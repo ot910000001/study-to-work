@@ -130,3 +130,19 @@ export async function getModelInfo(): Promise<ModelInfo> {
   if (!response.ok) throw new Error("ML service unavailable");
   return response.json();
 }
+
+export async function parseResume(file: File): Promise<{ text: string; skills: string[] }> {
+  const formData = new FormData();
+  formData.append("file", file);
+
+  const response = await fetch(`${ML_API_URL}/api/parse-resume`, {
+    method: "POST",
+    body: formData,
+  });
+
+  if (!response.ok) {
+    throw new Error(`ML service error: ${response.statusText}`);
+  }
+
+  return response.json();
+}

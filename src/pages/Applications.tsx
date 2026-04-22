@@ -190,7 +190,7 @@ export default function Applications() {
                       </span>
                       <span className="flex items-center gap-1">
                         <Briefcase className="h-4 w-4" />
-                        {application.jobs.job_type}
+                        {application.jobs.job_type?.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())}
                       </span>
                       <span className="flex items-center gap-1">
                         <Clock className="h-4 w-4" />

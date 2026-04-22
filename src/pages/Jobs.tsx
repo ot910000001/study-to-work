@@ -37,8 +37,19 @@ interface Job {
   created_at: string;
 }
 
-const jobTypes = ['Full-time', 'Part-time', 'Internship', 'Contract', 'Remote'];
-const experienceLevels = ['Entry Level', 'Mid Level', 'Senior Level', 'Executive'];
+const jobTypes = [
+  { value: 'full-time', label: 'Full-time' },
+  { value: 'part-time', label: 'Part-time' },
+  { value: 'internship', label: 'Internship' },
+  { value: 'contract', label: 'Contract' },
+  { value: 'remote', label: 'Remote' }
+];
+
+const experienceLevels = [
+  { value: 'entry', label: 'Entry Level' },
+  { value: 'mid', label: 'Mid Level' },
+  { value: 'senior', label: 'Senior Level' }
+];
 
 export default function Jobs() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -169,7 +180,7 @@ export default function Jobs() {
                   </SelectTrigger>
                   <SelectContent>
                     {jobTypes.map((type) => (
-                      <SelectItem key={type} value={type}>{type}</SelectItem>
+                      <SelectItem key={type.value} value={type.value}>{type.label}</SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
@@ -179,7 +190,7 @@ export default function Jobs() {
                   </SelectTrigger>
                   <SelectContent>
                     {experienceLevels.map((level) => (
-                      <SelectItem key={level} value={level}>{level}</SelectItem>
+                      <SelectItem key={level.value} value={level.value}>{level.label}</SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
@@ -199,10 +210,10 @@ export default function Jobs() {
                     <Badge variant="secondary">{locationFilter}</Badge>
                   )}
                   {jobTypeFilter && (
-                    <Badge variant="secondary">{jobTypeFilter}</Badge>
+                    <Badge variant="secondary">{jobTypes.find(t => t.value === jobTypeFilter)?.label || jobTypeFilter}</Badge>
                   )}
                   {experienceFilter && (
-                    <Badge variant="secondary">{experienceFilter}</Badge>
+                    <Badge variant="secondary">{experienceLevels.find(e => e.value === experienceFilter)?.label || experienceFilter}</Badge>
                   )}
                   <Button variant="ghost" size="sm" onClick={clearFilters}>
                     <X className="h-3 w-3 mr-1" />
@@ -271,11 +282,13 @@ export default function Jobs() {
                       </CardDescription>
                     </div>
                     <div className="flex gap-2">
-                      <Badge variant={job.job_type === 'Internship' ? 'secondary' : 'default'}>
-                        {job.job_type}
+                      <Badge variant={job.job_type === 'internship' ? 'secondary' : 'default'}>
+                        {job.job_type?.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())}
                       </Badge>
                       {job.experience_level && (
-                        <Badge variant="outline">{job.experience_level}</Badge>
+                        <Badge variant="outline">
+                          {job.experience_level.charAt(0).toUpperCase() + job.experience_level.slice(1)} Level
+                        </Badge>
                       )}
                     </div>
                   </div>

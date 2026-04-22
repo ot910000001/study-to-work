@@ -56,8 +56,8 @@ const features = [
   },
   {
     icon: FileText,
-    title: 'Resume Builder',
-    description: 'Create professional resumes with our templates or upload your existing one.',
+    title: 'Resume Center',
+    description: 'Upload your resume and let our AI extract keywords to boost your match scores.',
   },
   {
     icon: Bell,
@@ -318,7 +318,7 @@ export default function Index() {
               <h4 className="font-semibold text-foreground mb-4">For Students</h4>
               <ul className="space-y-2 text-sm text-muted-foreground">
                 <li><Link to="/jobs" className="hover:text-foreground transition-colors">Browse Jobs</Link></li>
-                <li><Link to="/resume-builder" className="hover:text-foreground transition-colors">Resume Builder</Link></li>
+                <li><Link to="/resume-center" className="hover:text-foreground transition-colors">Resume Center</Link></li>
                 <li><Link to="/companies" className="hover:text-foreground transition-colors">Companies</Link></li>
               </ul>
             </div>

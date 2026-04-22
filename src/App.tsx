@@ -16,7 +16,9 @@ import PostJob from "./pages/PostJob";
 import Notifications from "./pages/Notifications";
 import Profile from "./pages/Profile";
 import JobMatching from "./pages/JobMatching";
+import ResumeCenter from "./pages/ResumeCenter";
 import NotFound from "./pages/NotFound";
+import { ChatBot } from "./components/ChatBot";
 
 const queryClient = new QueryClient();
 
@@ -40,9 +42,11 @@ const App = () => (
             <Route path="/notifications" element={<Notifications />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/job-matching" element={<JobMatching />} />
+            <Route path="/resume-center" element={<ResumeCenter />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
+          <ChatBot />
         </BrowserRouter>
       </TooltipProvider>
     </AuthProvider>

@@ -13,10 +13,26 @@ Endpoints:
 - GET  /api/model-info   → Model information and status
 """
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from matching.engine import MatchingEngine
+import pypdf
+import io
+import re
+
+# Predefined list of common hard skills for extraction
+KNOWN_SKILLS = [
+    "python", "javascript", "typescript", "react", "node.js", "sql", "nosql", "machine learning",
+    "ai", "data science", "html", "css", "docker", "kubernetes", "aws", "gcp", "azure", "git",
+    "github", "linux", "c++", "java", "c#", "go", "rust", "php", "ruby", "swift", "angular",
+    "vue", "svelte", "django", "flask", "fastapi", "spring", "express", "pandas", "numpy",
+    "scikit-learn", "tensorflow", "pytorch", "keras", "sql server", "mysql", "postgresql",
+    "mongodb", "redis", "firebase", "supabase", "graphql", "rest api", "ci/cd", "agile",
+    "scrum", "jira", "figma", "ui/ux", "wireframing", "prototyping", "tailwind", "next.js", 
+    "vite", "vercel", "c", "keras", "nlp", "llms"
+]
+
 
 # ── App Setup ──────────────────────────────────────────────
 
@@ -179,3 +195,36 @@ async def model_info():
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
+
+@app.post("/api/parse-resume")
+async def parse_resume(file: UploadFile = File(...)):
+    """
+    Extracts text from a PDF resume and identifies common skills.
+    Returns the extracted text and a list of detected skills.
+    """
+    if file.content_type != "application/pdf":
+        raise HTTPException(status_code=400, detail="Only PDF files are supported.")
+    
+    try:
+        content = await file.read()
+        pdf_reader = pypdf.PdfReader(io.BytesBytesIO(content) if not hasattr(io, 'BytesIO') else io.BytesIO(content))
+        text = ""
+        for page in pdf_reader.pages:
+            page_text = page.extract_text()
+            if page_text:
+                text += page_text + " "
+                
+        text_lower = text.lower()
+        extracted_skills = set()
+        
+        for skill in KNOWN_SKILLS:
+            # Word boundary search for skills
+            if re.search(r'\b' + re.escape(skill) + r'\b', text_lower):
+                extracted_skills.add(skill)
+                
+        return {
+            "text": text.strip(),
+            "skills": list(extracted_skills)
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error processing PDF: {str(e)}")
